@@ -3,46 +3,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 /*
-  Material Design Chat Theme - Base Styles
+  WPBulgaria.com Chat Theme
 */
 
 :root {
   --primary-color: #00BFA5;
-  --secondary-color: #EEF4FB;
+  --primary-hover: #00a892;
+  --secondary-bg: #EEF4FB;
+  --text-dark: #1a2744;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
   --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --accent-gradient: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 50%, #a855f7 100%);
-  --human-bubble: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%);
 }
 
 @theme {
   --color-primary: var(--primary-color);
-  --color-secondary: var(--secondary-color);
+  --color-secondary: var(--secondary-bg);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html, body, #botui-app {
   @apply h-full w-full m-0 p-0;
   font-family: var(--font-family);
-  background: linear-gradient(135deg, var(--secondary-color)  0%, #e2ecf7 60%, var(--secondary-color) 100%);
+  background: linear-gradient(180deg, var(--secondary-bg) 0%, #e2ecf7 50%, var(--secondary-bg) 100%);
 }
 
-/* Animations */
+/* Chat Container - Full width, no card styling */
 .chat-container {
-  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  @apply w-full h-full flex flex-col;
+  min-height: calc(100vh - 80px); /* Assuming header ~80px */
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+/* Chat Header - WPBulgaria style */
+.chat-header {
+  @apply flex items-center gap-4 px-6 py-4 bg-white border-b;
+  border-color: var(--border-color);
 }
 
 .chat-avatar {
-  background: var(--accent-gradient);
+  @apply w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold;
+  background: var(--primary-color);
 }
 
 .status-dot {
@@ -64,11 +67,13 @@ html, body, #botui-app {
 }
 
 .botui_message_list {
-  @apply flex-1 overflow-y-auto px-6 py-4 scroll-smooth;
+  @apply flex-1 overflow-y-auto py-6 scroll-smooth;
+  padding-left: max(1.5rem, calc((100% - 800px) / 2));
+  padding-right: max(1.5rem, calc((100% - 800px) / 2));
 }
 
 .botui_message_list::-webkit-scrollbar {
-  @apply w-1.5;
+  @apply w-2;
 }
 
 .botui_message_list::-webkit-scrollbar-track {
@@ -84,14 +89,14 @@ html, body, #botui-app {
 }
 
 .botui_message {
-  @apply mb-4;
-  animation: messageIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  @apply mb-5;
+  animation: messageIn 0.3s ease-out;
 }
 
 @keyframes messageIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -108,26 +113,37 @@ html, body, #botui-app {
   @apply w-full;
 }
 
+/* Bot Messages - Clean white card style */
 .botui_message_content {
-  @apply max-w-[80%] px-4 py-3 text-base leading-relaxed inline-block bg-white text-slate-800 shadow-sm;
+  @apply max-w-[85%] px-5 py-4 text-base leading-relaxed inline-block bg-white;
   font-family: var(--font-family);
-  border-radius: 20px 20px 20px 6px;
+  color: var(--text-dark);
+  border-radius: 4px 20px 20px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+/* Human Messages - Primary color style */
 .botui_message_content.human {
-  @apply float-right text-white shadow-md;
-  background: var(--human-bubble);
-  border-radius: 20px 20px 6px 20px;
+  @apply float-right text-white;
+  background: var(--primary-color);
+  border-radius: 20px 4px 20px 20px;
+  box-shadow: 0 2px 8px rgba(0, 191, 165, 0.25);
 }
 
 .botui_message_content iframe {
   @apply border-0 w-full rounded-lg;
 }
 
-/* Action Container */
+/* Action Container - Input area */
 .botui_action_container {
-  @apply px-6 py-4 border-t border-slate-100 bg-white rounded-b-3xl max-sm:rounded-none;
+  @apply px-6 py-5 bg-white border-t;
+  border-color: var(--border-color);
   font-family: var(--font-family);
+}
+
+.botui_action_container > div {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .botui_action {
@@ -141,27 +157,43 @@ html, body, #botui-app {
 .botui_action textarea,
 .botui_action input:not([type='file']),
 .botui_action select {
-  @apply flex-1 px-4 py-3 rounded-2xl border-2 border-slate-200 outline-none transition-all duration-200 bg-slate-50 text-slate-800;
+  @apply flex-1 px-5 py-3.5 rounded-full border outline-none transition-all duration-200;
   font-family: var(--font-family);
+  font-size: 15px;
+  background: var(--secondary-bg);
+  border-color: var(--border-color);
+  color: var(--text-dark);
 }
 
 .botui_action textarea:focus,
 .botui_action input:not([type='file']):focus,
 .botui_action select:focus {
-  @apply border-indigo-500;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: var(--primary-color);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.12);
 }
 
 .botui_action textarea::placeholder,
 .botui_action input::placeholder {
-  @apply text-slate-400;
+  color: var(--text-muted);
 }
 
-/* Buttons */
+/* Buttons - WPBulgaria primary style */
 .botui_button {
-  @apply px-5 py-3 rounded-2xl font-semibold cursor-pointer transition-all duration-200 border-0 text-white shadow-md hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-sm;
+  @apply px-6 py-3.5 rounded-full font-semibold cursor-pointer transition-all duration-200 border-0 text-white;
   font-family: var(--font-family);
-  background: var(--accent-gradient);
+  font-size: 15px;
+  background: var(--primary-color);
+}
+
+.botui_button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 191, 165, 0.3);
+}
+
+.botui_button:active {
+  transform: translateY(0);
 }
 
 /* Loading Animation */
@@ -170,16 +202,17 @@ html, body, #botui-app {
 }
 
 .loading_dot {
-  @apply w-2.5 h-2.5 rounded-full inline-block bg-indigo-500;
+  @apply w-2.5 h-2.5 rounded-full inline-block;
+  background: var(--primary-color);
 }
 
 .loading_dot:nth-last-child(1) {
-  @apply ml-1;
+  @apply ml-1.5;
   animation: bounce 0.6s 0.3s ease-in-out infinite;
 }
 
 .loading_dot:nth-last-child(2) {
-  @apply ml-1;
+  @apply ml-1.5;
   animation: bounce 0.6s 0.2s ease-in-out infinite;
 }
 
@@ -189,28 +222,23 @@ html, body, #botui-app {
 
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-5px); }
 }
 
 /* Transitions */
 .slide-fade-enter-done {
   @apply transition-all duration-300;
-  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .slide-fade-enter,
 .slide-fade-exit-done {
-  @apply opacity-0 translate-y-2.5;
-}
-
-/* Message Links */
-.message_links a {
-  @apply underline underline-offset-2 break-all transition-colors duration-200 text-indigo-500 hover:text-indigo-400;
+  @apply opacity-0 translate-y-2;
 }
 
 /* Markdown Content */
 .markdown-content {
-  @apply text-inherit leading-relaxed;
+  @apply leading-relaxed;
+  color: var(--text-dark);
 }
 
 .markdown-content > *:first-child {
@@ -221,32 +249,86 @@ html, body, #botui-app {
   @apply mb-0;
 }
 
+.markdown-content a {
+  color: var(--primary-color);
+  @apply font-medium hover:underline;
+}
+
+.markdown-content code:not(pre code) {
+  @apply px-1.5 py-0.5 rounded text-sm font-mono;
+  background: var(--secondary-bg);
+  color: #d946ef;
+}
+
+.markdown-content pre {
+  @apply my-3 rounded-xl overflow-hidden;
+  background: var(--text-dark);
+}
+
+.markdown-content pre code {
+  @apply block p-4 text-sm font-mono overflow-x-auto text-slate-200;
+  background: transparent;
+}
+
+.markdown-content blockquote {
+  @apply pl-4 my-3 italic;
+  border-left: 3px solid var(--primary-color);
+  color: var(--text-muted);
+}
+
+.markdown-content hr {
+  @apply my-4;
+  border-color: var(--border-color);
+}
+
+.markdown-content table {
+  @apply w-full my-3 text-sm;
+  border-collapse: collapse;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply px-3 py-2 text-left;
+  border: 1px solid var(--border-color);
+}
+
+.markdown-content th {
+  background: var(--secondary-bg);
+  @apply font-semibold;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  @apply my-2 pl-6;
+}
+
+.markdown-content ul {
+  @apply list-disc;
+}
+
+.markdown-content ol {
+  @apply list-decimal;
+}
+
+.markdown-content li {
+  @apply my-1;
+}
+
 /* Human message markdown overrides */
+.botui_message_content.human .markdown-content {
+  color: #fff;
+}
+
 .botui_message_content.human .markdown-content a {
-  @apply text-white/90 hover:text-white;
+  @apply text-white underline;
 }
 
-.botui_message_content.human .markdown-content code {
-  @apply bg-white/20 text-white;
-}
-
-.botui_message_content.human .markdown-content pre code {
-  @apply bg-slate-900/50 text-slate-100;
+.botui_message_content.human .markdown-content code:not(pre code) {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 
 .botui_message_content.human .markdown-content blockquote {
-  @apply border-white/50;
-}
-
-.botui_message_content.human .markdown-content hr {
-  @apply border-white/30;
-}
-
-.botui_message_content.human .markdown-content th,
-.botui_message_content.human .markdown-content td {
-  @apply border-white/30;
-}
-
-.botui_message_content.human .markdown-content thead {
-  @apply bg-white/10;
+  border-color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.9);
 }

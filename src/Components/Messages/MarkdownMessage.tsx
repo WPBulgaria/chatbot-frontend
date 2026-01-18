@@ -16,24 +16,22 @@ export const MarkdownMessage = ({ message }: MarkdownMessageProps) => {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          // Custom link rendering to open in new tab
           a: ({ href, children }) => (
             <a
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2"
+              className="text-[#00BFA5] font-medium hover:underline"
             >
               {children}
             </a>
           ),
-          // Code blocks
           code: ({ className, children, ...props }) => {
             const isInline = !className
             if (isInline) {
               return (
                 <code
-                  className="bg-slate-700/50 text-pink-300 px-1.5 py-0.5 rounded text-sm font-mono"
+                  className="bg-[#EEF4FB] text-[#d946ef] px-1.5 py-0.5 rounded text-sm font-mono"
                   {...props}
                 >
                   {children}
@@ -42,67 +40,69 @@ export const MarkdownMessage = ({ message }: MarkdownMessageProps) => {
             }
             return (
               <code
-                className={`block bg-slate-800 text-slate-200 p-3 rounded-lg text-sm font-mono overflow-x-auto ${className}`}
+                className={`block text-slate-200 text-sm font-mono ${className || ''}`}
                 {...props}
               >
                 {children}
               </code>
             )
           },
-          // Pre blocks (code block wrapper)
           pre: ({ children }) => (
-            <pre className="my-2 overflow-x-auto">{children}</pre>
+            <pre className="my-3 bg-[#1a2744] rounded-xl overflow-hidden">
+              <div className="p-4 overflow-x-auto">{children}</div>
+            </pre>
           ),
-          // Paragraphs
-          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-          // Lists
+          p: ({ children }) => (
+            <p className="mb-3 last:mb-0">{children}</p>
+          ),
           ul: ({ children }) => (
-            <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>
+            <ul className="list-disc pl-6 mb-3 space-y-1">{children}</ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>
+            <ol className="list-decimal pl-6 mb-3 space-y-1">{children}</ol>
           ),
-          li: ({ children }) => <li className="ml-2">{children}</li>,
-          // Headings
+          li: ({ children }) => <li>{children}</li>,
           h1: ({ children }) => (
-            <h1 className="text-xl font-bold mb-2 mt-3 first:mt-0">{children}</h1>
+            <h1 className="text-xl font-bold mb-3 mt-4 first:mt-0 text-[#1a2744]">
+              {children}
+            </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-lg font-bold mb-2 mt-3 first:mt-0">{children}</h2>
+            <h2 className="text-lg font-bold mb-3 mt-4 first:mt-0 text-[#1a2744]">
+              {children}
+            </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-base font-bold mb-2 mt-2 first:mt-0">{children}</h3>
+            <h3 className="text-base font-bold mb-2 mt-3 first:mt-0 text-[#1a2744]">
+              {children}
+            </h3>
           ),
-          // Blockquote
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-indigo-400 pl-3 my-2 italic opacity-90">
+            <blockquote className="border-l-3 border-[#00BFA5] pl-4 my-3 text-[#64748b] italic">
               {children}
             </blockquote>
           ),
-          // Horizontal rule
-          hr: () => <hr className="my-3 border-slate-600" />,
-          // Strong/Bold
+          hr: () => <hr className="my-4 border-[#e2e8f0]" />,
           strong: ({ children }) => (
             <strong className="font-semibold">{children}</strong>
           ),
-          // Tables (GFM)
           table: ({ children }) => (
-            <div className="overflow-x-auto my-2">
-              <table className="min-w-full border-collapse text-sm">
+            <div className="overflow-x-auto my-3">
+              <table className="min-w-full border-collapse text-sm border border-[#e2e8f0] rounded-lg overflow-hidden">
                 {children}
               </table>
             </div>
           ),
           thead: ({ children }) => (
-            <thead className="bg-slate-700/50">{children}</thead>
+            <thead className="bg-[#EEF4FB]">{children}</thead>
           ),
           th: ({ children }) => (
-            <th className="border border-slate-600 px-3 py-1.5 text-left font-semibold">
+            <th className="border border-[#e2e8f0] px-4 py-2 text-left font-semibold text-[#1a2744]">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="border border-slate-600 px-3 py-1.5">{children}</td>
+            <td className="border border-[#e2e8f0] px-4 py-2">{children}</td>
           ),
         }}
       >

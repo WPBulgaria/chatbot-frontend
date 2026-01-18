@@ -27,8 +27,10 @@ export const StarsAction = () => {
       {stars.map((i) => (
         <button
           key={i}
-          className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl cursor-pointer transition-all duration-200 border-0 shadow-sm hover:shadow-md active:scale-95 ${
-            isHighlighted(i) ? 'scale-110 bg-indigo-500/15' : 'bg-slate-50'
+          className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl cursor-pointer transition-all duration-200 border shadow-sm hover:shadow-md active:scale-95 ${
+            isHighlighted(i) 
+              ? 'scale-110 bg-[#00BFA5]/15 border-[#00BFA5]' 
+              : 'bg-white border-[#e2e8f0] hover:border-[#00BFA5]/50'
           }`}
           onClick={() => handleStarClick(i)}
           onMouseEnter={() => handleMouseEnter(i)}
