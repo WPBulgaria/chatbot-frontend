@@ -1,0 +1,252 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/*
+  Material Design Chat Theme - Base Styles
+*/
+
+:root {
+  --primary-color: #00BFA5;
+  --secondary-color: #EEF4FB;
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --accent-gradient: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 50%, #a855f7 100%);
+  --human-bubble: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%);
+}
+
+@theme {
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+}
+
+html, body, #botui-app {
+  @apply h-full w-full m-0 p-0;
+  font-family: var(--font-family);
+  background: linear-gradient(135deg, var(--secondary-color)  0%, #e2ecf7 60%, var(--secondary-color) 100%);
+}
+
+/* Animations */
+.chat-container {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.chat-avatar {
+  background: var(--accent-gradient);
+}
+
+.status-dot {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* BotUI Library Overrides */
+.botui_app_container {
+  @apply w-full flex-1 flex flex-col overflow-hidden;
+}
+
+.botui_container {
+  @apply w-full flex-1 flex flex-col overflow-hidden;
+}
+
+.botui_message_list {
+  @apply flex-1 overflow-y-auto px-6 py-4 scroll-smooth;
+}
+
+.botui_message_list::-webkit-scrollbar {
+  @apply w-1.5;
+}
+
+.botui_message_list::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.botui_message_list::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full;
+}
+
+.botui_message_list::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+.botui_message {
+  @apply mb-4;
+  animation: messageIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.botui_message::after {
+  @apply block clear-both;
+  content: "";
+}
+
+.botui_message_container {
+  @apply w-full;
+}
+
+.botui_message_content {
+  @apply max-w-[80%] px-4 py-3 text-base leading-relaxed inline-block bg-white text-slate-800 shadow-sm;
+  font-family: var(--font-family);
+  border-radius: 20px 20px 20px 6px;
+}
+
+.botui_message_content.human {
+  @apply float-right text-white shadow-md;
+  background: var(--human-bubble);
+  border-radius: 20px 20px 6px 20px;
+}
+
+.botui_message_content iframe {
+  @apply border-0 w-full rounded-lg;
+}
+
+/* Action Container */
+.botui_action_container {
+  @apply px-6 py-4 border-t border-slate-100 bg-white rounded-b-3xl max-sm:rounded-none;
+  font-family: var(--font-family);
+}
+
+.botui_action {
+  @apply w-full;
+}
+
+.botui_action.action_input form {
+  @apply flex gap-3;
+}
+
+.botui_action textarea,
+.botui_action input:not([type='file']),
+.botui_action select {
+  @apply flex-1 px-4 py-3 rounded-2xl border-2 border-slate-200 outline-none transition-all duration-200 bg-slate-50 text-slate-800;
+  font-family: var(--font-family);
+}
+
+.botui_action textarea:focus,
+.botui_action input:not([type='file']):focus,
+.botui_action select:focus {
+  @apply border-indigo-500;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.botui_action textarea::placeholder,
+.botui_action input::placeholder {
+  @apply text-slate-400;
+}
+
+/* Buttons */
+.botui_button {
+  @apply px-5 py-3 rounded-2xl font-semibold cursor-pointer transition-all duration-200 border-0 text-white shadow-md hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-sm;
+  font-family: var(--font-family);
+  background: var(--accent-gradient);
+}
+
+/* Loading Animation */
+.botui_wait {
+  @apply leading-relaxed;
+}
+
+.loading_dot {
+  @apply w-2.5 h-2.5 rounded-full inline-block bg-indigo-500;
+}
+
+.loading_dot:nth-last-child(1) {
+  @apply ml-1;
+  animation: bounce 0.6s 0.3s ease-in-out infinite;
+}
+
+.loading_dot:nth-last-child(2) {
+  @apply ml-1;
+  animation: bounce 0.6s 0.2s ease-in-out infinite;
+}
+
+.loading_dot:nth-last-child(3) {
+  animation: bounce 0.6s 0.1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Transitions */
+.slide-fade-enter-done {
+  @apply transition-all duration-300;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-fade-enter,
+.slide-fade-exit-done {
+  @apply opacity-0 translate-y-2.5;
+}
+
+/* Message Links */
+.message_links a {
+  @apply underline underline-offset-2 break-all transition-colors duration-200 text-indigo-500 hover:text-indigo-400;
+}
+
+/* Markdown Content */
+.markdown-content {
+  @apply text-inherit leading-relaxed;
+}
+
+.markdown-content > *:first-child {
+  @apply mt-0;
+}
+
+.markdown-content > *:last-child {
+  @apply mb-0;
+}
+
+/* Human message markdown overrides */
+.botui_message_content.human .markdown-content a {
+  @apply text-white/90 hover:text-white;
+}
+
+.botui_message_content.human .markdown-content code {
+  @apply bg-white/20 text-white;
+}
+
+.botui_message_content.human .markdown-content pre code {
+  @apply bg-slate-900/50 text-slate-100;
+}
+
+.botui_message_content.human .markdown-content blockquote {
+  @apply border-white/50;
+}
+
+.botui_message_content.human .markdown-content hr {
+  @apply border-white/30;
+}
+
+.botui_message_content.human .markdown-content th,
+.botui_message_content.human .markdown-content td {
+  @apply border-white/30;
+}
+
+.botui_message_content.human .markdown-content thead {
+  @apply bg-white/10;
+}
