@@ -145,7 +145,7 @@ export class ChatsApi extends BaseApi {
                         // Update your React State here
                         updateBotMessage({
                           success: data.success,
-                          chatId: chatId || 0,
+                          chatId: data.chatId || 0,
                           message: botResponse,
                           isNew: true,
                           title: data.title || '',

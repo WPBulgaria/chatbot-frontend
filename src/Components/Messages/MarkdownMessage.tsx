@@ -11,6 +11,12 @@ interface MarkdownMessageProps {
 }
 
 export const MarkdownMessage = ({ message }: MarkdownMessageProps) => {
+  const text = message?.data?.text ?? ''
+  if (!text.trim()) {
+    return null
+  }
+  
+
   return (
     <div className="markdown-content">
       <ReactMarkdown
@@ -106,7 +112,7 @@ export const MarkdownMessage = ({ message }: MarkdownMessageProps) => {
           ),
         }}
       >
-        {message?.data?.text}
+        {text}
       </ReactMarkdown>
     </div>
   )

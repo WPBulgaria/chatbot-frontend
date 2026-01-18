@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Chat, ChatWithMessages, ListChatsResponse, makeChatsApi } from '../api/chats-api'
+import { Chat, ChatWithMessages, ListChatsResponse, makeChatsApi } from '../../api/chats-api'
 
 interface ConversationsModalProps {
   isOpen: boolean
