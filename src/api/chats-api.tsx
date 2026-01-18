@@ -1,12 +1,27 @@
 import { BaseApi } from './base-api';
 
+export interface Response {
+  success: boolean;
+  message?: string;
+}
+
 export interface Chat {
   id: number;
   title: string;
   userId: number;
+  userName?: string;
   createdAt: string;
-  updatedAt: string;
-  trashedAt?: string;
+  modifiedAt: string;
+}
+
+export interface GetChatResponse extends Response {
+  chat?: ChatWithMessages;
+}
+
+export interface ListChatsResponse extends Response {
+  chats: ChatWithMessages[];
+  total: number;
+  pages: number;
 }
 
 export interface ChatMessage {
@@ -26,13 +41,6 @@ export interface ModelChatMessage {
 
 export interface ChatWithMessages extends Chat {
   messages: ChatMessage[];
-}
-
-export interface ChatListResponse {
-  success: boolean;
-  chats: Chat[];
-  total: number;
-  pages: number;
 }
 
 export interface ChatResponse {
@@ -55,7 +63,7 @@ export class ChatsApi extends BaseApi {
     page = 1,
     perPage = 20,
     userId?: number,
-  ): Promise<ChatListResponse> {
+  ): Promise<ListChatsResponse> {
     const params = new URLSearchParams({
       page: page.toString(),
       per_page: perPage.toString(),
@@ -65,8 +73,10 @@ export class ChatsApi extends BaseApi {
     return response.json();
   }
 
-  public async get(id: number): Promise<ChatResponse> {
-    const response = await fetch(`${this.apiEndpoint}/chats/${id}`);
+  public async get(id: number): Promise<GetChatResponse> {
+    const response = await fetch(`${this.apiEndpoint}/chats/${id}`, {
+      headers: this.getHeaders(),
+    });
     return response.json();
   }
 
