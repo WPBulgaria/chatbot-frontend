@@ -1,67 +1,96 @@
-import React from 'react'
 import { ChatWithMessages } from '../../api/chats-api'
 import { useRef, useState, useEffect } from 'react'
 import { chat as chatAction, bot } from '../../lib/chat'
-import { BotUI, BotUIMessageList, BotUIAction, useBotUI } from '@botui/react'
+import { BotUI, BotUIMessageList, BotUIAction } from '@botui/react'
 import { ConversationsModal } from '../Modals/ConversationsModal'
 import { messageRenderers } from '../../lib/constants'
 import { actionRenderers } from '../../lib/constants'
+import { useTheme } from '../../lib/ThemeContext'
+import {Button} from '@headlessui/react'	
 
-export const Chat = ({ backToChat, setViewingChat }: { backToChat: () => void, setViewingChat: (chat: ChatWithMessages) => void }) => {
-    const isActiveRef = useRef<boolean>(false)
-    const [isModalOpen, setIsModalOpen] = useState(false)
+// Default robot logo component
+const RobotLogo = ({ primaryColor }: { primaryColor: string }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    {/* Antenna */}
+    <circle cx="12" cy="2" r="1.5" />
+    <rect x="11" y="3" width="2" height="3" />
+    {/* Head */}
+    <rect x="4" y="6" width="16" height="12" rx="2" />
+    {/* Eyes */}
+    <circle cx="9" cy="11" r="2" fill={primaryColor} />
+    <circle cx="15" cy="11" r="2" fill={primaryColor} />
+    {/* Mouth */}
+    <rect x="8" y="14" width="8" height="2" rx="1" fill={primaryColor} />
+    {/* Ears */}
+    <rect x="1" y="9" width="3" height="4" rx="1" />
+    <rect x="20" y="9" width="3" height="4" rx="1" />
+  </svg>
+)
 
-    useEffect(() => {
-      if (isActiveRef.current) return
-      isActiveRef.current = true
-      chatAction(true, 0, isActiveRef)
+export const Chat = ({ setViewingChat }: { backToChat: () => void, setViewingChat: (chat: ChatWithMessages) => void }) => {
+  const theme = useTheme()
+  const isActiveRef = useRef<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-      return () => {
-        isActiveRef.current = false
-        bot.message.removeAll()
-      }
-    }, [])
-  
-    const handleSelectChat = (selectedChat: ChatWithMessages) => {
-      console.log('selectedChat', selectedChat)
-      setViewingChat(selectedChat)
+  useEffect(() => {
+    if (isActiveRef.current) return
+    isActiveRef.current = true
+    chatAction(true, 0, isActiveRef, {
+      welcomeMessage: theme.labels.welcomeMessage,
+      inputPlaceholder: theme.labels.inputPlaceholder,
+      loadingMessage: theme.labels.loadingMessage,
+      errorMessage: theme.labels.errorMessage,
+      sendButton: theme.labels.sendButton,
+    })
+
+    return () => {
+      isActiveRef.current = false
+      bot.message.removeAll()
     }
+  }, [theme.labels])
 
-   // Render normal chat view
-   return (
+  const handleSelectChat = (selectedChat: ChatWithMessages) => {
+    setViewingChat(selectedChat)
+  }
+
+  const renderLogo = () => {
+    if (!theme.branding.logo) {
+      return <RobotLogo primaryColor={theme.colors.primary} />
+    }
+    if (typeof theme.branding.logo === 'string') {
+      return <img src={theme.branding.logo} alt={theme.branding.name} className="w-6 h-6 object-contain" />
+    }
+    return theme.branding.logo
+  }
+
+  return (
     <div className="chat-container">
       {/* Chat Header */}
       <header className="chat-header">
         <div className="chat-avatar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            {/* Antenna */}
-            <circle cx="12" cy="2" r="1.5" />
-            <rect x="11" y="3" width="2" height="3" />
-            {/* Head */}
-            <rect x="4" y="6" width="16" height="12" rx="2" />
-            {/* Eyes */}
-            <circle cx="9" cy="11" r="2" fill="#00BFA5" />
-            <circle cx="15" cy="11" r="2" fill="#00BFA5" />
-            {/* Mouth */}
-            <rect x="8" y="14" width="8" height="2" rx="1" fill="#00BFA5" />
-            {/* Ears */}
-            <rect x="1" y="9" width="3" height="4" rx="1" />
-            <rect x="20" y="9" width="3" height="4" rx="1" />
-          </svg>
+          {renderLogo()}
         </div>
         <div className="flex-1">
-          <h1 className="text-lg font-semibold text-[#1a2744]">WP Помощник</h1>
-          <p className="text-sm flex items-center gap-2 text-[#64748b]">
-            <span className="status-dot w-2 h-2 rounded-full bg-[#00BFA5]"></span>
-            Винаги на линия
+          <h1 className="text-lg font-semibold" style={{ color: theme.colors.textDark }}>
+            {theme.branding.name}
+          </h1>
+          <p className="text-sm flex items-center gap-2" style={{ color: theme.colors.textMuted }}>
+            {theme.branding.statusOnline && (
+              <span
+                className="status-dot w-2 h-2 rounded-full"
+                style={{ backgroundColor: theme.colors.primary }}
+              />
+            )}
+            {theme.branding.statusText}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => setIsModalOpen(true)}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer text-[#64748b] bg-transparent border-none hover:bg-[#00BFA5]/10 hover:text-[#00BFA5]"
-            aria-label="История"
-            title="История на разговорите"
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer bg-transparent border-none"
+            style={{ color: theme.colors.textMuted }}
+            aria-label={theme.labels.historyButtonTitle}
+            title={theme.labels.historyButtonTitle}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -77,11 +106,12 @@ export const Chat = ({ backToChat, setViewingChat }: { backToChat: () => void, s
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-          </button>
-          <button
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer text-[#64748b] bg-transparent border-none hover:bg-[#00BFA5]/10 hover:text-[#00BFA5]"
-            aria-label="Още опции"
-            title="Още опции"
+          </Button>
+          <Button
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer bg-transparent border-none"
+            style={{ color: theme.colors.textMuted }}
+            aria-label={theme.labels.moreOptionsTitle}
+            title={theme.labels.moreOptionsTitle}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +128,7 @@ export const Chat = ({ backToChat, setViewingChat }: { backToChat: () => void, s
               <circle cx="12" cy="5" r="1"></circle>
               <circle cx="12" cy="19" r="1"></circle>
             </svg>
-          </button>
+          </Button>
         </div>
       </header>
 

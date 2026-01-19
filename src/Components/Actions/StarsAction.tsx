@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useBotUI, useBotUIAction } from '@botui/react'
 
 export const StarsAction = () => {

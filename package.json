@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
-    "build": "vite build"
+    "build": "node ./scripts/remove-dist.js && tsc && vite build && node ./scripts/create-template-php.js",
+    "template": "node ./scripts/create-template-php.js"
   },
   "dependencies": {
     "@botui/react": "^1.1.5",
@@ -25,6 +26,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^5.1.2",
+    "node-html-parser": "^7.0.2",
     "sass-embedded": "^1.97.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",

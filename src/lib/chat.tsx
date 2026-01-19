@@ -4,30 +4,39 @@ import { makeChatsApi, ModelChatMessage } from '../api/chats-api'
 export const bot = createBot()
 export const chatsApi = makeChatsApi()
 
-
+export interface ChatLabels {
+  welcomeMessage: string
+  inputPlaceholder: string
+  loadingMessage: string
+  errorMessage: string
+  sendButton: string
+}
 
 export const chat = async (
   initial: boolean = false,
   chatId: number,
-  isActiveRef?: React.MutableRefObject<boolean>
+  isActiveRef: React.MutableRefObject<boolean> | undefined,
+  labels: ChatLabels
 ) => {
   const isActive = () => !isActiveRef || isActiveRef.current
 
-  let currentChatId = chatId;
+  let currentChatId = chatId
 
   if (initial) {
     if (!isActive()) return
     await bot.wait({ waitTime: 500 })
     if (!isActive()) return
     await bot.message.add({
-      text: 'Здравей, за какво имаш нужда от помощ за WordPress?',
+      text: labels.welcomeMessage,
     })
   }
 
+  console.log('labels', labels)
+
   while (isActive()) {
     const data = await bot.action.set(
-      { placeholder: 'Напиши съобщение...' },
-      { actionType: 'input', ephemeral: true }
+      { placeholder: labels.inputPlaceholder },
+      { actionType: 'input', ephemeral: true, confirmButtonText: labels.sendButton }
     )
 
     if (!isActive()) return
@@ -45,7 +54,7 @@ export const chat = async (
     bot.wait({ waitTime: 60000 })
 
     try {
-      const messageIndex = await bot.message.add({ text: 'Генериране на отговор...' })
+      const messageIndex = await bot.message.add({ text: labels.loadingMessage })
       if (!isActive()) return
 
       let firstChunk = true
@@ -57,8 +66,7 @@ export const chat = async (
             return
           }
 
-          console.log('response', response, 'currentChatId', response.chatId)
-          currentChatId = response.chatId || currentChatId;
+          currentChatId = response.chatId || currentChatId
 
           if (firstChunk) {
             bot.next()
@@ -67,9 +75,7 @@ export const chat = async (
 
           if (!response.success) {
             await bot.message.update(messageIndex, {
-              text:
-                response.message ||
-                'Съжалявам, не мога да се свържа със сървъра. Моля, опитай отново по-късно.',
+              text: response.message || labels.errorMessage,
             })
             bot.next()
             return
@@ -84,7 +90,7 @@ export const chat = async (
       bot.next()
       console.error('Chat error:', error)
       await bot.message.add({
-        text: 'Съжалявам, не мога да се свържа със сървъра. Моля, опитай отново по-късно.',
+        text: labels.errorMessage,
       })
     }
   }

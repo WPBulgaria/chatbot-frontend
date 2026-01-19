@@ -1,19 +1,41 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
 /*
   WPBulgaria.com Chat Theme
+  CSS Variables are set dynamically by ThemeProvider
 */
 
 :root {
+  /* Default values - overridden by ThemeProvider */
   --primary-color: #00BFA5;
   --primary-hover: #00a892;
   --secondary-bg: #EEF4FB;
   --text-dark: #1a2744;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
+  --bot-message-bg: #ffffff;
+  --bot-message-text: #1a2744;
+  --user-message-bg: #00BFA5;
+  --user-message-text: #ffffff;
+  --code-bg: #EEF4FB;
+  --code-text: #d946ef;
+  --code-block-bg: #1a2744;
+  --code-block-text: #e2e8f0;
   --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --page-bg: linear-gradient(180deg, #EEF4FB 0%, #e2ecf7 50%, #EEF4FB 100%);
+  --header-bg: #ffffff;
+  --input-area-bg: #ffffff;
+  --modal-bg: #ffffff;
+  --modal-backdrop: rgba(0, 0, 0, 0.4);
+  --shadow-bot-message: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-user-message: 0 2px 8px rgba(0, 191, 165, 0.25);
+  --shadow-button: 0 4px 12px rgba(0, 191, 165, 0.3);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --radius-message: 20px;
+  --radius-input: 9999px;
+  --radius-button: 9999px;
+  --radius-avatar: 9999px;
+  --radius-modal: 16px;
 }
 
 @theme {
@@ -25,27 +47,29 @@
   box-sizing: border-box;
 }
 
-html, body, #botui-app {
+html, body, #botui-app, #wp-chatbot-chat-container {
   @apply h-full w-full m-0 p-0;
   font-family: var(--font-family);
-  background: linear-gradient(180deg, var(--secondary-bg) 0%, #e2ecf7 50%, var(--secondary-bg) 100%);
+  background: var(--page-bg);
 }
 
 /* Chat Container - Full width, no card styling */
 .chat-container {
   @apply w-full h-full flex flex-col;
-  min-height: calc(100vh - 80px); /* Assuming header ~80px */
+  min-height: calc(100vh - 80px);
 }
 
-/* Chat Header - WPBulgaria style */
+/* Chat Header */
 .chat-header {
-  @apply flex items-center gap-4 px-6 py-4 bg-white border-b;
+  @apply flex items-center gap-4 px-6 py-4 border-b;
+  background: var(--header-bg);
   border-color: var(--border-color);
 }
 
 .chat-avatar {
-  @apply w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold;
+  @apply w-11 h-11 flex items-center justify-center text-white text-base font-bold;
   background: var(--primary-color);
+  border-radius: var(--radius-avatar);
 }
 
 .status-dot {
@@ -115,28 +139,32 @@ html, body, #botui-app {
 
 /* Bot Messages - Clean white card style */
 .botui_message_content {
-  @apply max-w-[85%] px-5 py-4 text-base leading-relaxed inline-block bg-white;
+  @apply max-w-[85%] px-5 py-4 text-base leading-relaxed inline-block;
   font-family: var(--font-family);
-  color: var(--text-dark);
-  border-radius: 4px 20px 20px 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background: var(--bot-message-bg);
+  color: var(--bot-message-text);
+  border-radius: 4px var(--radius-message) var(--radius-message) var(--radius-message);
+  box-shadow: var(--shadow-bot-message);
 }
 
 /* Human Messages - Primary color style */
 .botui_message_content.human {
-  @apply float-right text-white;
-  background: var(--primary-color);
-  border-radius: 20px 4px 20px 20px;
-  box-shadow: 0 2px 8px rgba(0, 191, 165, 0.25);
+  @apply float-right;
+  background: var(--user-message-bg);
+  color: var(--user-message-text);
+  border-radius: var(--radius-message) 4px var(--radius-message) var(--radius-message);
+  box-shadow: var(--shadow-user-message);
 }
 
 .botui_message_content iframe {
-  @apply border-0 w-full rounded-lg;
+  @apply border-0 w-full;
+  border-radius: var(--radius-modal);
 }
 
 /* Action Container - Input area */
 .botui_action_container {
-  @apply px-6 py-5 bg-white border-t;
+  @apply px-6 py-5 border-t;
+  background: var(--input-area-bg);
   border-color: var(--border-color);
   font-family: var(--font-family);
 }
@@ -157,12 +185,13 @@ html, body, #botui-app {
 .botui_action textarea,
 .botui_action input:not([type='file']),
 .botui_action select {
-  @apply flex-1 px-5 py-3.5 rounded-full border outline-none transition-all duration-200;
+  @apply flex-1 px-5 py-3.5 border outline-none transition-all duration-200;
   font-family: var(--font-family);
   font-size: 15px;
   background: var(--secondary-bg);
   border-color: var(--border-color);
   color: var(--text-dark);
+  border-radius: var(--radius-input);
 }
 
 .botui_action textarea:focus,
@@ -170,7 +199,7 @@ html, body, #botui-app {
 .botui_action select:focus {
   border-color: var(--primary-color);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 12%, transparent);
 }
 
 .botui_action textarea::placeholder,
@@ -178,18 +207,19 @@ html, body, #botui-app {
   color: var(--text-muted);
 }
 
-/* Buttons - WPBulgaria primary style */
+/* Buttons - Primary style */
 .botui_button {
-  @apply px-6 py-3.5 rounded-full font-semibold cursor-pointer transition-all duration-200 border-0 text-white;
+  @apply px-6 py-3.5 font-semibold cursor-pointer transition-all duration-200 border-0 text-white;
   font-family: var(--font-family);
   font-size: 15px;
   background: var(--primary-color);
+  border-radius: var(--radius-button);
 }
 
 .botui_button:hover {
   background: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 191, 165, 0.3);
+  box-shadow: var(--shadow-button);
 }
 
 .botui_button:active {
@@ -238,7 +268,7 @@ html, body, #botui-app {
 /* Markdown Content */
 .markdown-content {
   @apply leading-relaxed;
-  color: var(--text-dark);
+  color: var(--bot-message-text);
 }
 
 .markdown-content > *:first-child {
@@ -256,18 +286,20 @@ html, body, #botui-app {
 
 .markdown-content code:not(pre code) {
   @apply px-1.5 py-0.5 rounded text-sm font-mono;
-  background: var(--secondary-bg);
-  color: #d946ef;
+  background: var(--code-bg);
+  color: var(--code-text);
 }
 
 .markdown-content pre {
-  @apply my-3 rounded-xl overflow-hidden;
-  background: var(--text-dark);
+  @apply my-3 overflow-hidden;
+  background: var(--code-block-bg);
+  border-radius: var(--radius-modal);
 }
 
 .markdown-content pre code {
-  @apply block p-4 text-sm font-mono overflow-x-auto text-slate-200;
+  @apply block p-4 text-sm font-mono overflow-x-auto;
   background: transparent;
+  color: var(--code-block-text);
 }
 
 .markdown-content blockquote {
@@ -316,16 +348,17 @@ html, body, #botui-app {
 
 /* Human message markdown overrides */
 .botui_message_content.human .markdown-content {
-  color: #fff;
+  color: var(--user-message-text);
 }
 
 .botui_message_content.human .markdown-content a {
-  @apply text-white underline;
+  color: var(--user-message-text);
+  @apply underline;
 }
 
 .botui_message_content.human .markdown-content code:not(pre code) {
   background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  color: var(--user-message-text);
 }
 
 .botui_message_content.human .markdown-content blockquote {
@@ -355,5 +388,8 @@ html, body, #botui-app {
 }
 
 .readonly-notice {
-  @apply px-6 py-4 bg-[#EEF4FB] border-t border-[#e2e8f0] text-center text-sm text-[#64748b];
+  @apply px-6 py-4 border-t text-center text-sm;
+  background: var(--secondary-bg);
+  border-color: var(--border-color);
+  color: var(--text-muted);
 }

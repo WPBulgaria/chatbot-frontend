@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -15,7 +14,7 @@ export const MarkdownMessage = ({ message }: MarkdownMessageProps) => {
   if (!text.trim()) {
     return null
   }
-  
+
 
   return (
     <div className="markdown-content">

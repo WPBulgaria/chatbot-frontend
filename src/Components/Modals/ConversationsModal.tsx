@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { Chat, ChatWithMessages, ListChatsResponse, makeChatsApi } from '../../api/chats-api'
+import { useEffect, useState } from 'react'
+import { ChatWithMessages, ListChatsResponse, makeChatsApi } from '../../api/chats-api'
+import { useTheme } from '../../lib/ThemeContext'
 
 interface ConversationsModalProps {
   isOpen: boolean
@@ -10,6 +11,7 @@ interface ConversationsModalProps {
 const chatsApi = makeChatsApi()
 
 export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: ConversationsModalProps) => {
+  const theme = useTheme()
   const [chats, setChats] = useState<ListChatsResponse['chats']>([])
   const [loading, setLoading] = useState(false)
   const [loadingChatId, setLoadingChatId] = useState<number | null>(null)
@@ -37,7 +39,6 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
   const handleChatClick = async (chatId: number) => {
     setLoadingChatId(chatId)
     try {
-
       const response = await chatsApi.get(chatId)
       if (response.success && response.chat) {
         onSelectChat(response.chat)
@@ -57,18 +58,19 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
 
     if (diffDays === 0) {
-      return 'Днес'
-    } else if (diffDays === 1) {
-      return 'Вчера'
-    } else if (diffDays < 7) {
-      return `Преди ${diffDays} дни`
-    } else {
-      return date.toLocaleDateString('bg-BG', {
-        day: 'numeric',
-        month: 'short',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-      })
+      return theme.labels.dateToday
     }
+    if (diffDays === 1) {
+      return theme.labels.dateYesterday
+    }
+    if (diffDays < 7) {
+      return theme.labels.dateDaysAgo(diffDays)
+    }
+    return date.toLocaleDateString('bg-BG', {
+      day: 'numeric',
+      month: 'short',
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    })
   }
 
   if (!isOpen) return null
@@ -77,25 +79,39 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
+        className="fixed inset-0 backdrop-blur-sm z-40 transition-opacity"
+        style={{ backgroundColor: theme.backgrounds.modalBackdrop }}
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden animate-modal-in"
+          className="shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden animate-modal-in"
+          style={{
+            backgroundColor: theme.backgrounds.modal,
+            borderRadius: theme.borderRadius.modal,
+            boxShadow: theme.shadows.modal,
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#e2e8f0]">
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b"
+            style={{ borderColor: theme.colors.border }}
+          >
             <div>
-              <h2 className="text-lg font-semibold text-[#1a2744]">История на разговорите</h2>
-              <p className="text-sm text-[#64748b]">Преглед на предишни чатове</p>
+              <h2 className="text-lg font-semibold" style={{ color: theme.colors.textDark }}>
+                {theme.labels.historyTitle}
+              </h2>
+              <p className="text-sm" style={{ color: theme.colors.textMuted }}>
+                {theme.labels.historySubtitle}
+              </p>
             </div>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-[#64748b] hover:bg-[#EEF4FB] hover:text-[#1a2744] transition-colors"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+              style={{ color: theme.colors.textMuted }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +133,7 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="flex items-center gap-3 text-[#64748b]">
+                <div className="flex items-center gap-3" style={{ color: theme.colors.textMuted }}>
                   <svg
                     className="animate-spin w-5 h-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -138,19 +154,22 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  <span>Зареждане...</span>
+                  <span>{theme.labels.historyLoading}</span>
                 </div>
               </div>
             ) : chats.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center px-6">
-                <div className="w-16 h-16 rounded-full bg-[#EEF4FB] flex items-center justify-center mb-4">
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                  style={{ backgroundColor: theme.colors.secondaryBg }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="28"
                     height="28"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#64748b"
+                    stroke={theme.colors.textMuted}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -158,26 +177,33 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                   </svg>
                 </div>
-                <p className="text-[#1a2744] font-medium mb-1">Няма предишни разговори</p>
-                <p className="text-sm text-[#64748b]">Започнете нов чат, за да видите историята тук</p>
+                <p className="font-medium mb-1" style={{ color: theme.colors.textDark }}>
+                  {theme.labels.historyEmpty}
+                </p>
+                <p className="text-sm" style={{ color: theme.colors.textMuted }}>
+                  {theme.labels.historyEmptyHint}
+                </p>
               </div>
             ) : (
-              <div className="divide-y divide-[#e2e8f0]">
+              <div className="divide-y" style={{ borderColor: theme.colors.border }}>
                 {chats.map((chat) => (
                   <button
                     key={chat.id}
                     onClick={() => handleChatClick(chat.id)}
                     disabled={loadingChatId === chat.id}
-                    className="w-full px-6 py-4 text-left hover:bg-[#EEF4FB] transition-colors flex items-start gap-4 disabled:opacity-60"
+                    className="w-full px-6 py-4 text-left transition-colors flex items-start gap-4 disabled:opacity-60"
                   >
-                    <div className="w-10 h-10 rounded-full bg-[#00BFA5]/10 flex items-center justify-center flex-shrink-0">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: `${theme.colors.primary}15` }}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="18"
                         height="18"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#00BFA5"
+                        stroke={theme.colors.primary}
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -187,12 +213,13 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <h3 className="font-medium text-[#1a2744] truncate">
-                          {chat.title || 'Разговор без заглавие'}
+                        <h3 className="font-medium truncate" style={{ color: theme.colors.textDark }}>
+                          {chat.title || theme.labels.historyUntitled}
                         </h3>
                         {loadingChatId === chat.id && (
                           <svg
-                            className="animate-spin w-4 h-4 text-[#00BFA5] flex-shrink-0"
+                            className="animate-spin w-4 h-4 flex-shrink-0"
+                            style={{ color: theme.colors.primary }}
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
@@ -213,7 +240,9 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
                           </svg>
                         )}
                       </div>
-                      <p className="text-sm text-[#64748b]">{formatDate(chat.createdAt)}</p>
+                      <p className="text-sm" style={{ color: theme.colors.textMuted }}>
+                        {formatDate(chat.createdAt)}
+                      </p>
                     </div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -221,7 +250,7 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
                       height="16"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#64748b"
+                      stroke={theme.colors.textMuted}
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"

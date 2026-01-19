@@ -67,9 +67,14 @@ export class ChatsApi extends BaseApi {
     const params = new URLSearchParams({
       page: page.toString(),
       per_page: perPage.toString(),
+      userId: userId?.toString() || '',
     });
 
-    const response = await fetch(`${this.apiEndpoint}/chats?${params}`);
+    const response = await fetch(`${this.apiEndpoint}/chats?${params}`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
     return response.json();
   }
 
@@ -90,9 +95,7 @@ export class ChatsApi extends BaseApi {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify({ message }),
     });
 
