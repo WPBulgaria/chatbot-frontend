@@ -99,6 +99,14 @@ export class ChatsApi extends BaseApi {
       body: JSON.stringify({ message }),
     });
 
+    if (!response.ok) {
+      const data = await response.json();
+      return {
+        success: false,
+        message: data.message,
+      };
+    }
+
     return response.json();
   }
 
@@ -119,6 +127,18 @@ export class ChatsApi extends BaseApi {
         headers: this.getHeaders(),
         body: JSON.stringify({ message: message, chatId: chatId }),
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      updateBotMessage({
+        success: false,
+        chatId: chatId || 0,
+        message: data.message,
+        isNew: true,
+        title: '',
+      });
+      return;
+    }
   
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();

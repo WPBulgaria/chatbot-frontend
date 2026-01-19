@@ -11,7 +11,7 @@ let themeData = {}
 try {
 
     if ((window as any).wpbChatbotConfig?.chatTheme) {
-        themeData = JSON.parse((window as any).wpbChatbotConfig.chatTheme)
+        themeData = (window as any).wpbChatbotConfig.chatTheme
     }
 } catch (error) {
     console.error('Error parsing chat theme:', error)
