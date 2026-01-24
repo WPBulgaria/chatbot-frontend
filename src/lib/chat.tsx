@@ -31,8 +31,6 @@ export const chat = async (
     })
   }
 
-  console.log('labels', labels)
-
   while (isActive()) {
     const data = await bot.action.set(
       { placeholder: labels.inputPlaceholder },

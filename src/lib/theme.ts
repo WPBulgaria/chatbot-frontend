@@ -102,6 +102,11 @@ export interface ChatTheme {
 }
 
 export const defaultTheme: ChatTheme = {
+  configs: {
+    history: true,
+    readOnly: false,
+  },
+
   branding: {
     name: 'WP Помощник',
     logo: undefined,  // Uses default robot icon
@@ -190,6 +195,7 @@ export const defaultTheme: ChatTheme = {
 
 // Partial theme type for overrides
 export interface PartialChatTheme {
+  configs?: Partial<ChatTheme['configs']>
   branding?: Partial<ChatTheme['branding']>
   colors?: Partial<ChatTheme['colors']>
   typography?: Partial<ChatTheme['typography']>
@@ -202,6 +208,7 @@ export interface PartialChatTheme {
 // Helper to merge partial theme with defaults
 export const createTheme = (overrides: PartialChatTheme = {}): ChatTheme => {
   return {
+    configs: { ...defaultTheme.configs, ...overrides.configs },
     branding: { ...defaultTheme.branding, ...overrides.branding },
     colors: { ...defaultTheme.colors, ...overrides.colors },
     typography: { ...defaultTheme.typography, ...overrides.typography },

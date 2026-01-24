@@ -77,8 +77,7 @@ export const Chat = ({ setViewingChat }: { backToChat: () => void, setViewingCha
           <p className="text-sm flex items-center gap-2" style={{ color: theme.colors.textMuted }}>
             {theme.branding.statusOnline && (
               <span
-                className="status-dot w-2 h-2 rounded-full"
-                style={{ backgroundColor: theme.colors.primary }}
+                className="status-dot w-2 h-2 rounded-full bg-green-500"
               />
             )}
             {theme.branding.statusText}

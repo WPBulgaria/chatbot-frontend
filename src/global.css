@@ -47,10 +47,10 @@
   box-sizing: border-box;
 }
 
-html, body, #botui-app, #wp-chatbot-chat-container {
+#botui-app, #wp-chatbot-chat-container, .wpb-chat-page {
   @apply h-full w-full m-0 p-0;
   font-family: var(--font-family);
-  background: var(--page-bg);
+  background: var(--page-bg) !important;
 }
 
 /* Chat Container - Full width, no card styling */
@@ -78,7 +78,7 @@ html, body, #botui-app, #wp-chatbot-chat-container {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.3; }
 }
 
 /* BotUI Library Overrides */

@@ -22,9 +22,10 @@ $plugin_url = plugin_dir_url(dirname(__DIR__));
             event.stopPropagation();
         })
 
-        let bodyLink = document.createElement("link");
-        bodyLink.setAttribute("rel", "stylesheet");
-        bodyLink.setAttribute("href", '<?php echo esc_url($plugin_url . "/assets/chat__STYLE_LINK__"); ?>');
-        document.body.prepend(bodyLink);
+        let shadowLink = document.createElement("link");
+        shadowLink.setAttribute("rel", "stylesheet");
+        shadowLink.setAttribute("href", '<?php echo esc_url($plugin_url . "/assets/chat__STYLE_LINK__"); ?>');
+    
+        $("#wp-chatbot-chat-container")[0].shadowRoot.prepend(shadowLink);
     });
 </script>

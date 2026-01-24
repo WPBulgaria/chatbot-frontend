@@ -20,7 +20,7 @@ try {
 const theme = createTheme(themeData)
 
 
-const App = () => {
+const App = ({ history }: { history?: boolean }) => {
   const [viewingChat, setViewingChat] = useState<ChatWithMessages | null>(null)
 
   const handleBackToChat = () => {
@@ -32,13 +32,15 @@ const App = () => {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      {viewingChat ? (
-        <ViewChat viewingChat={viewingChat} handleBackToChat={handleBackToChat} />
-      ) : (
-        <Chat backToChat={handleBackToChat} setViewingChat={handleSelectChat} />
-      )}
-    </ThemeProvider>
+    <div className="wpb-chat-page">
+      <ThemeProvider theme={{ ...theme, configs: { ...theme.configs, history: history !== undefined ? history : theme.configs?.history }}}>
+        {viewingChat ? (
+          <ViewChat viewingChat={viewingChat} handleBackToChat={handleBackToChat} />
+        ) : (
+          <Chat backToChat={handleBackToChat} setViewingChat={handleSelectChat} />
+        )}
+      </ThemeProvider>
+    </div>
   )
 }
 

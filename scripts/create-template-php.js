@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const parser = require('node-html-parser')
 
 try {
-    const template = fs.readFileSync('./scripts/template.php', 'utf8');
+    const template = fs.readFileSync('./scripts/assets.php', 'utf8');
 
     const source = fs.readFileSync('./dist/index.html', 'utf8');
     const root = parser.parse(source);
@@ -15,7 +15,7 @@ try {
         .replace("__STYLE_LINK__", link.getAttribute("href"))
 
 
-    fs.writeFileSync("./dist/template.php", parsedTemplate);
+    fs.writeFileSync("./dist/assets.php", parsedTemplate);
     process.exit();
 } catch (err) {
     console.error(err);
