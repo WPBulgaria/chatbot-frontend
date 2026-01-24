@@ -1,6 +1,11 @@
 import { ReactNode } from 'react'
 
 export interface ChatTheme {
+  // General
+  configs?: {
+    history?: boolean
+    readOnly?: boolean
+  }
   // Branding
   branding: {
     name: string

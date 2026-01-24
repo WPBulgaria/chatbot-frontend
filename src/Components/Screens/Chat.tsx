@@ -85,6 +85,7 @@ export const Chat = ({ setViewingChat }: { backToChat: () => void, setViewingCha
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {theme.configs?.history && (
           <Button
             onClick={() => setIsModalOpen(true)}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer bg-transparent border-none"
@@ -107,6 +108,7 @@ export const Chat = ({ setViewingChat }: { backToChat: () => void, setViewingCha
               <polyline points="12 6 12 12 16 14" />
             </svg>
           </Button>
+          )}
           <Button
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer bg-transparent border-none"
             style={{ color: theme.colors.textMuted }}
