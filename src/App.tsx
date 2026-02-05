@@ -4,15 +4,37 @@ import { Chat } from './Components/Screens/Chat'
 import { ViewChat } from './Components/Screens/ViewChat'
 import { ThemeProvider } from './lib/ThemeContext'
 import { createTheme } from './lib/theme'
+import { appContainerId } from './lib/constants'
+import { ChatbotIdProvider } from './lib/ChatbotIdContext'
 
 // Create your custom theme by overriding defaults
 let themeData = {}
+let chatbotId = null as string | null;
+let streamingType = null as string | null;
+let mercureHost = null as string | null;
 
 try {
+  const rootElement = document.getElementById(appContainerId)
+  if (rootElement?.getAttribute('data-theme')) {
+    themeData = JSON.parse(rootElement.getAttribute('data-theme') || '{}')
+  }
 
-    if ((window as any).wpbChatbotConfig?.chatTheme) {
-        themeData = (window as any).wpbChatbotConfig.chatTheme
-    }
+  if (rootElement?.getAttribute('data-streaming')) {
+    streamingType = rootElement?.getAttribute('data-streaming') || null;
+  }
+
+  chatbotId = rootElement?.getAttribute('data-chatbot') || null;
+
+  if (rootElement?.getAttribute('data-mercure-host')) {
+    mercureHost = rootElement?.getAttribute('data-mercure-host') || null;
+  }
+
+
+  if (process.env.NODE_ENV === 'development') {
+      if ((window as any).wpbChatbotConfig?.chatTheme) {
+          themeData = (window as any).wpbChatbotConfig.chatTheme
+      }
+  }
 } catch (error) {
     console.error('Error parsing chat theme:', error)
 }
@@ -32,15 +54,17 @@ const App = ({ history }: { history?: boolean }) => {
   }
 
   return (
-    <div className="wpb-chat-page">
-      <ThemeProvider theme={{ ...theme, configs: { ...theme.configs, history: history !== undefined ? history : theme.configs?.history }}}>
-        {viewingChat ? (
-          <ViewChat viewingChat={viewingChat} handleBackToChat={handleBackToChat} />
-        ) : (
-          <Chat backToChat={handleBackToChat} setViewingChat={handleSelectChat} />
-        )}
-      </ThemeProvider>
-    </div>
+    <ChatbotIdProvider chatbotId={chatbotId} streamingType={streamingType} mercureHost={mercureHost}>
+      <div className="wpb-chat-page">
+        <ThemeProvider theme={{ ...theme, configs: { ...theme.configs, history: history !== undefined ? history : theme.configs?.history }}}>
+          {viewingChat ? (
+            <ViewChat viewingChat={viewingChat} handleBackToChat={handleBackToChat} />
+          ) : (
+            <Chat backToChat={handleBackToChat} setViewingChat={handleSelectChat} />
+          )}
+        </ThemeProvider>
+      </div>
+    </ChatbotIdProvider>
   )
 }
 

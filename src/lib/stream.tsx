@@ -1,8 +1,8 @@
 import { createBot } from 'botui'
-import { makeChatsApi } from '../api/chats-api'
+import { makeChatsApi, ModelChatMessage } from '../api/chats-api'
 
 export const bot = createBot()
-export const chatsApi = makeChatsApi(null, null)
+
 
 export interface ChatLabels {
   welcomeMessage: string
@@ -12,25 +12,23 @@ export interface ChatLabels {
   sendButton: string
 }
 
-export const chat = async (
-  initial: boolean = false,
+export const stream = async (
+  streamingType: string | null,
   chatbotId: string | null,
   chatId: number,
   isActiveRef: React.MutableRefObject<boolean> | undefined,
+  mercureHost: string | null,
   labels: ChatLabels
 ) => {
   const isActive = () => !isActiveRef || isActiveRef.current
-
+  const chatsApi = makeChatsApi(streamingType, mercureHost)
   let currentChatId = chatId
 
-  if (initial) {
-    if (!isActive()) return
-    await bot.wait({ waitTime: 500 })
-    if (!isActive()) return
-    await bot.message.add({
-      text: labels.welcomeMessage,
-    })
-  }
+  await bot.wait({ waitTime: 500 })
+  await bot.message.add({
+    text: labels?.welcomeMessage || 'Hello!',
+  })
+
 
   while (isActive()) {
     const data = await bot.action.set(
@@ -56,16 +54,38 @@ export const chat = async (
       const messageIndex = await bot.message.add({ text: labels.loadingMessage })
       if (!isActive()) return
 
-      const chatResponse = await chatsApi.chat(
+      let firstChunk = true
+
+      const botResponse = await chatsApi.stream(
         chatbotId,
         userMessage,
+        async (response: ModelChatMessage & { success: boolean }) => {
+          if (!isActive()) {
+            return
+          }
+
+          currentChatId = response.chatId || currentChatId
+
+          if (firstChunk) {
+            bot.next()
+            firstChunk = false
+          }
+
+          if (!response.success) {
+            await bot.message.update(messageIndex, {
+              text: response.message || labels.errorMessage,
+            })
+            bot.next()
+            return
+          }
+
+          await bot.message.update(messageIndex, { text: response.message })
+        },
         currentChatId
       )
 
-      if (chatResponse.success) {
-        await bot.message.update(messageIndex, { text: chatResponse.chat?.message })
-      } else {
-        await bot.message.update(messageIndex, { text: chatResponse.message || labels.errorMessage })
+      if (botResponse) {
+        await bot.message.update(messageIndex, { text: botResponse })
       }
     } catch (error) {
       if (!isActive()) return

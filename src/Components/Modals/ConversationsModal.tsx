@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ChatWithMessages, ListChatsResponse, makeChatsApi } from '../../api/chats-api'
 import { useTheme } from '../../lib/ThemeContext'
+import { useChatbotId } from '../../lib/ChatbotIdContext'
 
 interface ConversationsModalProps {
   isOpen: boolean
@@ -15,6 +16,7 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
   const [chats, setChats] = useState<ListChatsResponse['chats']>([])
   const [loading, setLoading] = useState(false)
   const [loadingChatId, setLoadingChatId] = useState<number | null>(null)
+  const chatbotId = useChatbotId()
 
   useEffect(() => {
     if (isOpen) {
@@ -25,7 +27,7 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
   const loadChats = async () => {
     setLoading(true)
     try {
-      const response = await chatsApi.list(1, 50)
+      const response = await chatsApi.list(chatbotId, 1, 50)
       if (response.success) {
         setChats(response.chats)
       }
@@ -39,7 +41,7 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
   const handleChatClick = async (chatId: number) => {
     setLoadingChatId(chatId)
     try {
-      const response = await chatsApi.get(chatId)
+      const response = await chatsApi.get(chatbotId, chatId)
       if (response.success && response.chat) {
         onSelectChat(response.chat)
         onClose()

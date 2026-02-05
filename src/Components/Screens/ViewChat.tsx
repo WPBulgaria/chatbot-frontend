@@ -52,24 +52,10 @@ export const ViewChat = ({ viewingChat, handleBackToChat }: { viewingChat: ChatW
         {viewingChat.messages.map((message) => (
           <div
             key={message.id}
-            className={`mb-5 ${message.role === 'user' ? 'text-right' : ''}`}
+            className={`botui_message ${message.role === 'user' ? 'text-right' : ''}`}
           >
             <div
-              className="inline-block max-w-[85%] px-5 py-4 text-base leading-relaxed"
-              style={{
-                backgroundColor: message.role === 'user' 
-                  ? theme.colors.userMessageBg 
-                  : theme.colors.botMessageBg,
-                color: message.role === 'user' 
-                  ? theme.colors.userMessageText 
-                  : theme.colors.botMessageText,
-                borderRadius: message.role === 'user'
-                  ? `${theme.borderRadius.message} 4px ${theme.borderRadius.message} ${theme.borderRadius.message}`
-                  : `4px ${theme.borderRadius.message} ${theme.borderRadius.message} ${theme.borderRadius.message}`,
-                boxShadow: message.role === 'user' 
-                  ? theme.shadows.userMessage 
-                  : theme.shadows.botMessage,
-              }}
+              className={`inline-block max-w-[85%] px-5 py-4 text-base leading-relaxed botui_message_content ${message.role === 'user' ? 'human' : 'bot'}`}
             >
               <MarkdownMessage message={{data: {text: message.content}}} />
             </div>

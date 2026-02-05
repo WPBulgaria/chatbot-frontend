@@ -1,12 +1,13 @@
 import { ChatWithMessages } from '../../api/chats-api'
 import { useRef, useState, useEffect } from 'react'
-import { chat as chatAction, bot } from '../../lib/chat'
+import { stream as chatAction, bot } from '../../lib/stream'
 import { BotUI, BotUIMessageList, BotUIAction } from '@botui/react'
 import { ConversationsModal } from '../Modals/ConversationsModal'
 import { messageRenderers } from '../../lib/constants'
 import { actionRenderers } from '../../lib/constants'
 import { useTheme } from '../../lib/ThemeContext'
 import {Button} from '@headlessui/react'	
+import { useChatbotId } from '../../lib/ChatbotIdContext'
 
 // Default robot logo component
 const RobotLogo = ({ primaryColor }: { primaryColor: string }) => (
@@ -31,11 +32,13 @@ export const Chat = ({ setViewingChat }: { backToChat: () => void, setViewingCha
   const theme = useTheme()
   const isActiveRef = useRef<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { chatbotId, streamingType, mercureHost } = useChatbotId()
 
   useEffect(() => {
     if (isActiveRef.current) return
     isActiveRef.current = true
-    chatAction(true, 0, isActiveRef, {
+
+    chatAction(streamingType, chatbotId, 0,  isActiveRef, mercureHost, {
       welcomeMessage: theme.labels.welcomeMessage,
       inputPlaceholder: theme.labels.inputPlaceholder,
       loadingMessage: theme.labels.loadingMessage,
@@ -47,7 +50,7 @@ export const Chat = ({ setViewingChat }: { backToChat: () => void, setViewingCha
       isActiveRef.current = false
       bot.message.removeAll()
     }
-  }, [theme.labels])
+  }, [theme.labels, chatbotId, streamingType ])
 
   const handleSelectChat = (selectedChat: ChatWithMessages) => {
     setViewingChat(selectedChat)

@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './global.css';
+import { appContainerId } from './lib/constants';
 
-const rootElement = document.getElementById(process.env.NODE_ENV === 'development' ? 'botui-app' : 'wp-chatbot-chat-container');
+const rootElement = document.getElementById(appContainerId);
 if (!rootElement) {
   throw new Error('Failed to find the root element');
 }
