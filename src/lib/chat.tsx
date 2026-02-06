@@ -2,7 +2,7 @@ import { createBot } from 'botui'
 import { makeChatsApi } from '../api/chats-api'
 
 export const bot = createBot()
-export const chatsApi = makeChatsApi(null, null)
+export const chatsApi = makeChatsApi()
 
 export interface ChatLabels {
   welcomeMessage: string

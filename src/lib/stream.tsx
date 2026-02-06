@@ -3,6 +3,12 @@ import { makeChatsApi, ModelChatMessage } from '../api/chats-api'
 
 export const bot = createBot()
 
+export interface StreamConfig {
+  streamingType: string | null;
+  mercureHost: string | null;
+  nodeHost: string | null;
+  labels: ChatLabels;
+}
 
 export interface ChatLabels {
   welcomeMessage: string
@@ -13,15 +19,14 @@ export interface ChatLabels {
 }
 
 export const stream = async (
-  streamingType: string | null,
   chatbotId: string | null,
   chatId: number,
-  isActiveRef: React.MutableRefObject<boolean> | undefined,
-  mercureHost: string | null,
-  labels: ChatLabels
+  config: StreamConfig,
+  isActiveRef: React.MutableRefObject<boolean> | undefined
 ) => {
+  const { labels } = config
   const isActive = () => !isActiveRef || isActiveRef.current
-  const chatsApi = makeChatsApi(streamingType, mercureHost)
+  const chatsApi = makeChatsApi(config)
   let currentChatId = chatId
 
   await bot.wait({ waitTime: 500 })
@@ -59,7 +64,7 @@ export const stream = async (
       const botResponse = await chatsApi.stream(
         chatbotId,
         userMessage,
-        async (response: ModelChatMessage & { success: boolean }) => {
+        async (response: Omit<ModelChatMessage, 'title'> & { success: boolean }) => {
           if (!isActive()) {
             return
           }

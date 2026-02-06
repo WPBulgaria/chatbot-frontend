@@ -7,7 +7,7 @@ import { messageRenderers } from '../../lib/constants'
 import { actionRenderers } from '../../lib/constants'
 import { useTheme } from '../../lib/ThemeContext'
 import {Button} from '@headlessui/react'	
-import { useChatbotId } from '../../lib/ChatbotIdContext'
+import { useChatbotConfig } from '../../lib/ChatbotConfigContext'
 
 // Default robot logo component
 const RobotLogo = ({ primaryColor }: { primaryColor: string }) => (
@@ -32,19 +32,23 @@ export const Chat = ({ setViewingChat }: { backToChat: () => void, setViewingCha
   const theme = useTheme()
   const isActiveRef = useRef<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { chatbotId, streamingType, mercureHost } = useChatbotId()
+  const { chatbotId, streamingType, mercureHost, nodeHost } = useChatbotConfig()  
 
   useEffect(() => {
     if (isActiveRef.current) return
     isActiveRef.current = true
 
-    chatAction(streamingType, chatbotId, 0,  isActiveRef, mercureHost, {
+    chatAction(chatbotId, 0, {
+      streamingType: streamingType,
+      mercureHost: mercureHost,
+      nodeHost: nodeHost,
+      labels: {
       welcomeMessage: theme.labels.welcomeMessage,
       inputPlaceholder: theme.labels.inputPlaceholder,
       loadingMessage: theme.labels.loadingMessage,
       errorMessage: theme.labels.errorMessage,
       sendButton: theme.labels.sendButton,
-    })
+    }}, isActiveRef)
 
     return () => {
       isActiveRef.current = false

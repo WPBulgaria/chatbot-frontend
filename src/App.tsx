@@ -5,13 +5,14 @@ import { ViewChat } from './Components/Screens/ViewChat'
 import { ThemeProvider } from './lib/ThemeContext'
 import { createTheme } from './lib/theme'
 import { appContainerId } from './lib/constants'
-import { ChatbotIdProvider } from './lib/ChatbotIdContext'
+import { ChatbotConfigProvider } from './lib/ChatbotConfigContext'
 
 // Create your custom theme by overriding defaults
 let themeData = {}
 let chatbotId = null as string | null;
 let streamingType = null as string | null;
 let mercureHost = null as string | null;
+let nodeHost = null as string | null;
 
 try {
   const rootElement = document.getElementById(appContainerId)
@@ -27,6 +28,10 @@ try {
 
   if (rootElement?.getAttribute('data-mercure-host')) {
     mercureHost = rootElement?.getAttribute('data-mercure-host') || null;
+  }
+
+  if (rootElement?.getAttribute('data-node-host')) {
+    nodeHost = rootElement?.getAttribute('data-node-host') || null;
   }
 
 
@@ -54,7 +59,7 @@ const App = ({ history }: { history?: boolean }) => {
   }
 
   return (
-    <ChatbotIdProvider chatbotId={chatbotId} streamingType={streamingType} mercureHost={mercureHost}>
+    <ChatbotConfigProvider chatbotId={chatbotId} streamingType={streamingType} mercureHost={mercureHost} nodeHost={nodeHost}>
       <div className="wpb-chat-page">
         <ThemeProvider theme={{ ...theme, configs: { ...theme.configs, history: history !== undefined ? history : theme.configs?.history }}}>
           {viewingChat ? (
@@ -64,7 +69,7 @@ const App = ({ history }: { history?: boolean }) => {
           )}
         </ThemeProvider>
       </div>
-    </ChatbotIdProvider>
+    </ChatbotConfigProvider>
   )
 }
 

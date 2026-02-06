@@ -1,5 +1,8 @@
 import { BaseApi } from './base-api';
 import {  EventSourcePolyfill } from 'event-source-polyfill';
+import { StreamConfig } from '../lib/stream';
+import { SessionToken } from '../lib/Session';
+
 
 export interface Response {
   success: boolean;
@@ -59,17 +62,27 @@ export class ChatsApi extends BaseApi {
 
   private streamingType: string | null = null;
   private mercureHost: string | null = null;
+  private nodeHost: string | null = null;
+  private sessionToken: SessionToken = new SessionToken();
+
+
   constructor() {
     super();
   }
 
-  public setStreamingType(streamingType: "string" | null) {
+  public setStreamingType(streamingType: string | null) {
     this.streamingType = streamingType;
   }
 
   public setMercureHost(mercureHost: string | null) {
     this.mercureHost = mercureHost;
   }
+
+  public setNodeHost(nodeHost: string | null) {
+    this.nodeHost = nodeHost;
+  }
+
+
 
   public async list(
     chatbotId: string | null,
@@ -206,7 +219,7 @@ export class ChatsApi extends BaseApi {
   private async nodeJsStream(
     chatbotId: string | null,
     message: string,
-    updateBotMessage: (response: ModelChatMessage & { success: boolean }) => void,
+    updateBotMessage: (response: Omit<ModelChatMessage, 'title'> & { success: boolean } ) => void,
     chatId?: number,
   ): Promise<string> {
 
@@ -216,16 +229,22 @@ export class ChatsApi extends BaseApi {
         chatId: chatId || 0,
         message: 'Mercure host is not set. Please check your configuration.',
         isNew: true,
-        title: '',
       });
       return '';
     }
+
+
+    const token = this.sessionToken.get();
   
     // 1. TRIGGER: Send the user message to PHP
     // PHP saves the message, dispatches the job to Node, and returns the Topic URL immediately.
-    const url = chatId
+    let url = chatId
       ? `${this.apiEndpoint}/chatbots/${chatbotId}/chats/${chatId}/stream`
       : `${this.apiEndpoint}/chatbots/${chatbotId}/chats/stream`;
+
+    if (chatId && token) {
+      url = `${this.nodeHost}/process-message`;
+    }
   
     const response = await fetch(url, {
         method: 'POST',
@@ -234,14 +253,25 @@ export class ChatsApi extends BaseApi {
           'Content-Type': 'application/json', // Just standard JSON now
           'Accept': 'text/event-stream',
         },
-        body: JSON.stringify({ message: message, chatId: chatId })
+        body: JSON.stringify({ message: message, chatId: chatId, token: token })
     });
+
+    try {
+      if (chatId && token) {
+        const decoded = this.sessionToken.getDecoded();
+        return this.listenTopic({ topic: decoded.topic, token: token, chatId: chatId }, updateBotMessage);
+      }
+    } catch (e) {
+      return '';
+    }
+
 
     const text = await response.text();
     let data: any = {};
     const jsonStr = text.replace('data: ', '').replaceAll('event: success\n', '').replaceAll('event: error\n', '');
     try {
       data = JSON.parse(jsonStr);
+      this.sessionToken.set(data.token, data.expiresIn);
       return this.listenTopic(data, updateBotMessage);
     } catch (e) {
       return '';
@@ -249,7 +279,7 @@ export class ChatsApi extends BaseApi {
   }
 
 
-  protected async listenTopic(data: { topic: string, token: string, chatId: number, title: string }, updateBotMessage: (response: ModelChatMessage & { success: boolean }) => void): Promise<string> {
+  protected async listenTopic(data: { topic: string, token: string, chatId: number }, updateBotMessage: (response: Omit<ModelChatMessage, 'title'> & { success: boolean }) => void): Promise<string> {
 
     if (!this.mercureHost) {
       return '';
@@ -275,7 +305,6 @@ export class ChatsApi extends BaseApi {
       eventSource.onmessage = (event) => {
         try {
           const streamData = JSON.parse(event.data);
-          console.log(streamData, 'streamData');
   
           // A. HANDLE END OF STREAM
           // Your Node worker must send { isFinal: true } when done.
@@ -294,7 +323,6 @@ export class ChatsApi extends BaseApi {
               chatId: data.chatId, // Use the ID from PHP (important for New Chats)
               message: botResponse,
               isNew: true,
-              title: data.title || '',
             });
           }
         } catch (e) {
@@ -321,7 +349,7 @@ export class ChatsApi extends BaseApi {
   public async stream(
     chatbotId: string | null,
     message: string,
-    updateBotMessage: (response: ModelChatMessage & { success: boolean }) => void,
+    updateBotMessage: (response: Omit<ModelChatMessage, 'title'> & { success: boolean }) => void,
     chatId?: number,
   ): Promise<string> {
 
@@ -334,9 +362,13 @@ export class ChatsApi extends BaseApi {
   
 }
 
-export const makeChatsApi = (streamingType: string | null, mercureHost: string | null) => {
+export const makeChatsApi = (config?: StreamConfig | null) => {
   const chatsApi = new ChatsApi();
-  chatsApi.setStreamingType(streamingType as "string" | null);
-  chatsApi.setMercureHost(mercureHost as string | null);
+
+  if (config && config.streamingType === 'nodejs') {
+    chatsApi.setStreamingType(config.streamingType);
+    chatsApi.setMercureHost(config.mercureHost);
+    chatsApi.setNodeHost(config.nodeHost);
+  }
   return chatsApi;
 };

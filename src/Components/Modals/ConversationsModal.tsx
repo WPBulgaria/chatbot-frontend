@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ChatWithMessages, ListChatsResponse, makeChatsApi } from '../../api/chats-api'
 import { useTheme } from '../../lib/ThemeContext'
-import { useChatbotId } from '../../lib/ChatbotIdContext'
+import { useChatbotConfig } from '../../lib/ChatbotConfigContext'
 
 interface ConversationsModalProps {
   isOpen: boolean
@@ -16,7 +16,7 @@ export const ConversationsModal = ({ isOpen, onClose, onSelectChat }: Conversati
   const [chats, setChats] = useState<ListChatsResponse['chats']>([])
   const [loading, setLoading] = useState(false)
   const [loadingChatId, setLoadingChatId] = useState<number | null>(null)
-  const chatbotId = useChatbotId()
+  const { chatbotId } = useChatbotConfig()
 
   useEffect(() => {
     if (isOpen) {
