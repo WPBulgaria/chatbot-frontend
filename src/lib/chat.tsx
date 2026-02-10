@@ -53,7 +53,10 @@ export const chat = async (
     bot.wait({ waitTime: 60000 })
 
     try {
-      const messageIndex = await bot.message.add({ text: labels.loadingMessage })
+      const messageIndex = await bot.message.add(
+        { text: labels.loadingMessage },
+        { messageType: 'thinking' }
+      )
       if (!isActive()) return
 
       const chatResponse = await chatsApi.chat(
@@ -63,9 +66,17 @@ export const chat = async (
       )
 
       if (chatResponse.success) {
-        await bot.message.update(messageIndex, { text: chatResponse.chat?.message })
+        await bot.message.update(
+          messageIndex,
+          { text: chatResponse.chat?.message },
+          { messageType: 'text' }
+        )
       } else {
-        await bot.message.update(messageIndex, { text: chatResponse.message || labels.errorMessage })
+        await bot.message.update(
+          messageIndex,
+          { text: chatResponse.message || labels.errorMessage },
+          { messageType: 'text' }
+        )
       }
     } catch (error) {
       if (!isActive()) return

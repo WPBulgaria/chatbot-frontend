@@ -56,7 +56,10 @@ export const stream = async (
     bot.wait({ waitTime: 60000 })
 
     try {
-      const messageIndex = await bot.message.add({ text: labels.loadingMessage })
+      const messageIndex = await bot.message.add(
+        { text: labels.loadingMessage },
+        { messageType: 'thinking' }
+      )
       if (!isActive()) return
 
       let firstChunk = true
@@ -77,20 +80,30 @@ export const stream = async (
           }
 
           if (!response.success) {
-            await bot.message.update(messageIndex, {
-              text: response.message || labels.errorMessage,
-            })
+            await bot.message.update(
+              messageIndex,
+              { text: response.message || labels.errorMessage },
+              { messageType: 'text' }
+            )
             bot.next()
             return
           }
 
-          await bot.message.update(messageIndex, { text: response.message })
+          await bot.message.update(
+            messageIndex,
+            { text: response.message },
+            { messageType: 'text' }
+          )
         },
         currentChatId
       )
 
       if (botResponse) {
-        await bot.message.update(messageIndex, { text: botResponse })
+        await bot.message.update(
+          messageIndex,
+          { text: botResponse },
+          { messageType: 'text' }
+        )
       }
     } catch (error) {
       if (!isActive()) return

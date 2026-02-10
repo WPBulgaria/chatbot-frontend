@@ -236,6 +236,10 @@
   background: var(--primary-color);
 }
 
+.thinking-message .loading_dot {
+  @apply w-1.5 h-1.5;
+}
+
 .loading_dot:nth-last-child(1) {
   @apply ml-1.5;
   animation: bounce 0.6s 0.3s ease-in-out infinite;
